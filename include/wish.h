@@ -13,4 +13,6 @@
 
 void print_error();
 void execute_command(char *command);
+void interactive_mode();
+void batch_mode(const char* filename);
 #endif
