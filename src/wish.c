@@ -1,5 +1,8 @@
 #include "wish.h"
 
+//이 브랜치에서 구현할 것
+//- 내장명령 cd와 path
+//- 리다이렉션 기능
 int main(int argc, char** argv) {
     if (argc > 1) { // 인자가 주어진 경우 배치 모드
         batch_mode(argv[1]); // 첫 번째 인자(파일 이름)를 배치 모드에 전달
