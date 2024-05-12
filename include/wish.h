@@ -15,4 +15,6 @@ void print_error();
 void execute_command(char *command);
 void interactive_mode();
 void batch_mode(const char* filename);
+void command_cd(char* directory);//cd 내장명령
+void command_path(char* path);//path 내장명령
 #endif
