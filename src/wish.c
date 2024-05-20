@@ -130,6 +130,7 @@ void command_cd(char* directory) {
 void command_path(char** paths) {
     if (paths[0] == NULL) {
         setenv("PATH", "", 1);
+        printf("PATH cleared\n");
     } else {
         char new_path[MAX_INPUT_SIZE] = "";
         for (int i = 0; paths[i] != NULL; i++) {
@@ -139,6 +140,7 @@ void command_path(char** paths) {
             strcat(new_path, paths[i]);
         }
         setenv("PATH", new_path, 1);
+        printf("PATH set to: %s\n", new_path); // 시각화 위한 출력 추가
     }
 }
 
