@@ -81,7 +81,7 @@ void execute_command(char* command) {
             }
         }
         else if (strcmp(args[0], "path") == 0) {
-            command_path(args[1]);
+            command_path(args + 1);
         }
         else {
             execvp(args[0], args); //다른 프로그램을 실행한다. 
@@ -94,11 +94,25 @@ void execute_command(char* command) {
 }
 
 void command_cd(char* directory) {
-    printf("function command_cd() executed, args : %s\n", directory);
+    if (chdir(directory) != 0) {
+        print_error();
+    }
 }
 
-void command_path(char* paths) {
-    printf("function command_path() executed, args : %s\n", paths);
+void command_path(char** paths) {
+    if (paths[0] == NULL) {
+    // 빈 경로 배열인 경우, path를 빈 문자열로 설정
+    setenv("PATH", "", 1);
+    } else {
+        char new_path[MAX_INPUT_SIZE] = "";
+        for (int i = 0; paths[i] != NULL; i++) {
+            if (i > 0) {
+                strcat(new_path, ":");
+            }
+            strcat(new_path, paths[i]);
+        }
+        setenv("PATH", new_path, 1);
+    }
 }
 
 void print_error() {
