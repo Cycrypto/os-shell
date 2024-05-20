@@ -122,9 +122,18 @@ void execute_command(char* command) {
 }
 
 void command_cd(char* directory) {
-    if (chdir(directory) != 0) {
+    if (directory == NULL || strcmp(directory, "~") == 0) {
+        directory = getenv("HOME");
+    }
+    if (chdir(directory) == 0) {
+        char cwd[MAX_INPUT_SIZE];
+        if (getcwd(cwd, sizeof(cwd)) != NULL) {
+            printf("Directory changed to %s\n", cwd);
+        }
+    } else {
         print_error();
     }
+
 }
 
 void command_path(char** paths) {
