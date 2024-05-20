@@ -1,5 +1,8 @@
 #include "wish.h"
 
+//이 브랜치에서 구현할 것
+//- 내장명령 cd와 path : 대화형모드
+//- 리다이렉션 기능
 int main(int argc, char** argv) {
     if (argc > 1) { // 인자가 주어진 경우 배치 모드
         batch_mode(argv[1]); // 첫 번째 인자(파일 이름)를 배치 모드에 전달
@@ -16,7 +19,7 @@ void interactive_mode() {
 
     while (1) {
         printf("%s", PROMPT); // 프롬프트 출력
-        fflush(stdout);
+        fflush(stdout);//스트림에 남아있는 데이터를 출력위치로 보내준다(출력 버퍼를 비운다.)
 
         if (fgets(input, sizeof(input), stdin) == NULL) {
             exit(0); // EOF일 경우 종료
@@ -59,23 +62,40 @@ void execute_command(char* command) {
     int argc = 0;
 
     char* token = strtok(command, " \t");
+    // char* token = strtok(command, " "); 이렇게 되어야 하지 않나?
     while (token != NULL) {
         args[argc++] = token;
         token = strtok(NULL, " \t");
     }
 
-    args[argc] = NULL;
+    args[argc] = NULL; 
 
     pid_t pid = fork();
     if (pid < 0) {
         print_error();
-    } else if (pid == 0) {
-        execvp(args[0], args);
-        print_error();
-        exit(1);
+    } else if (pid == 0) { //여기에 cd, path 구현
+        if (args[0] == "cd") {
+
+        }
+        else if (args[0] == "path") {
+
+        }
+        else {
+            execvp(args[0], args); //다른 프로그램을 실행한다. 
+            print_error();
+            exit(1);
+        }
     } else {
         wait(NULL);
     }
+}
+
+void command_cd(char* directory) {
+    //char* directory : cd 뒤에 나오는 이동 경로이다.
+}
+
+void command_path(char* path) {
+
 }
 
 void print_error() {
