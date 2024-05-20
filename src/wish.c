@@ -19,7 +19,7 @@ void interactive_mode() {
 
     while (1) {
         printf("%s", PROMPT); // 프롬프트 출력
-        fflush(stdout);//스트림에 남아있는 데이터를 출력위치로 보내준다(출력 버퍼를 비운다.)
+        fflush(stdout); // 스트림에 남아있는 데이터를 출력위치로 보내준다(출력 버퍼를 비운다.)
 
         if (fgets(input, sizeof(input), stdin) == NULL) {
             exit(0); // EOF일 경우 종료
@@ -62,7 +62,6 @@ void execute_command(char* command) {
     int argc = 0;
 
     char* token = strtok(command, " \t");
-    // char* token = strtok(command, " "); 이렇게 되어야 하지 않나?
     while (token != NULL) {
         args[argc++] = token;
         token = strtok(NULL, " \t");
@@ -74,11 +73,15 @@ void execute_command(char* command) {
     if (pid < 0) {
         print_error();
     } else if (pid == 0) { //여기에 cd, path 구현
-        if (args[0] == "cd") {
-
+        if (strcmp(args[0], "cd") == 0) {
+            if (argc != 2) {
+                print_error();
+            } else {
+                command_cd(args[1]);
+            }
         }
-        else if (args[0] == "path") {
-
+        else if (strcmp(args[0], "path") == 0) {
+            command_path(args[1]);
         }
         else {
             execvp(args[0], args); //다른 프로그램을 실행한다. 
@@ -91,11 +94,11 @@ void execute_command(char* command) {
 }
 
 void command_cd(char* directory) {
-    //char* directory : cd 뒤에 나오는 이동 경로이다.
+    printf("function command_cd() executed, args : %s\n", directory);
 }
 
-void command_path(char* path) {
-
+void command_path(char* paths) {
+    printf("function command_path() executed, args : %s\n", paths);
 }
 
 void print_error() {
