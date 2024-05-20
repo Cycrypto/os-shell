@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <sys/wait.h>
 
 #define MAX_INPUT_SIZE 1024
@@ -15,6 +16,6 @@ void print_error();
 void execute_command(char *command);
 void interactive_mode();
 void batch_mode(const char* filename);
-void command_cd(char* directory);//cd ³»Àå¸í·É
-void command_path(char* path);//path ³»Àå¸í·É
+void command_cd(char* directory);//cd ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+void command_path(char** path);//path ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 #endif

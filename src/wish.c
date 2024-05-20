@@ -19,7 +19,7 @@ void interactive_mode() {
 
     while (1) {
         printf("%s", PROMPT); // 프롬프트 출력
-        fflush(stdout);//스트림에 남아있는 데이터를 출력위치로 보내준다(출력 버퍼를 비운다.)
+        fflush(stdout); // 스트림에 남아있는 데이터를 출력위치로 보내준다(출력 버퍼를 비운다.)
 
         if (fgets(input, sizeof(input), stdin) == NULL) {
             exit(0); // EOF일 경우 종료
@@ -62,40 +62,84 @@ void execute_command(char* command) {
     int argc = 0;
 
     char* token = strtok(command, " \t");
-    // char* token = strtok(command, " "); 이렇게 되어야 하지 않나?
     while (token != NULL) {
         args[argc++] = token;
         token = strtok(NULL, " \t");
     }
 
-    args[argc] = NULL; 
+    args[argc] = NULL;
 
-    pid_t pid = fork();
-    if (pid < 0) {
-        print_error();
-    } else if (pid == 0) { //여기에 cd, path 구현
-        if (args[0] == "cd") {
-
+    // 리다이렉션 처리
+    char* output_file = NULL;
+    for (int i = 0; i < argc; i++) {
+        if (strcmp(args[i], ">") == 0) {
+            if (i + 1 < argc) {
+                output_file = args[i + 1];
+                args[i] = NULL;
+                argc = i; // 리다이렉션 연산자 이후의 인자를 제거
+                break;
+            } else {
+                print_error();
+                return;
+            }
         }
-        else if (args[0] == "path") {
+    }
 
+    if (argc == 0) {
+        return;
+    }
+
+    // 내장 명령어 처리
+    if (strcmp(args[0], "cd") == 0) {
+        if (argc != 2) {
+            print_error();
+        } else {
+            command_cd(args[1]);
         }
-        else {
-            execvp(args[0], args); //다른 프로그램을 실행한다. 
+    } else if (strcmp(args[0], "path") == 0) {
+        command_path(args + 1);
+    } else {
+        pid_t pid = fork();
+        if (pid < 0) {
+            print_error();
+        } else if (pid == 0) {
+            if (output_file != NULL) {
+                int fd = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+                if (fd < 0) {
+                    print_error();
+                    exit(1);
+                }
+                dup2(fd, STDOUT_FILENO);
+                close(fd);
+            }
+            execvp(args[0], args);
             print_error();
             exit(1);
+        } else {
+            wait(NULL);
         }
-    } else {
-        wait(NULL);
     }
 }
 
 void command_cd(char* directory) {
-    //char* directory : cd 뒤에 나오는 이동 경로이다.
+    if (chdir(directory) != 0) {
+        print_error();
+    }
 }
 
-void command_path(char* path) {
-
+void command_path(char** paths) {
+    if (paths[0] == NULL) {
+        setenv("PATH", "", 1);
+    } else {
+        char new_path[MAX_INPUT_SIZE] = "";
+        for (int i = 0; paths[i] != NULL; i++) {
+            if (i > 0) {
+                strcat(new_path, ":");
+            }
+            strcat(new_path, paths[i]);
+        }
+        setenv("PATH", new_path, 1);
+    }
 }
 
 void print_error() {
