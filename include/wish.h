@@ -9,7 +9,7 @@
 #include <sys/wait.h>
 
 #define MAX_INPUT_SIZE 1024
-#define ERROR_MESSAGE "Unexpected Error\n"
+#define ERROR_MESSAGE "An error has occurred\nn"
 #define PROMPT "wish> "
 
 void print_error();
