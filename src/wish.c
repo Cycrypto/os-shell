@@ -98,6 +98,9 @@ void execute_command(char* command) {
         }
     } else if (strcmp(args[0], "path") == 0) {
         command_path(args + 1);
+    } else if (strcmp(args[0], "exit") == 0) {
+	printf("exit shell\n");
+	exit(0);
     } else {
         pid_t pid = fork();
         if (pid < 0) {
