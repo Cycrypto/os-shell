@@ -47,6 +47,77 @@ prompt > ./bin/wish
 prompt > ./bin/wish ./tests/batch_test.txt
 ```
 
+## 명령어
+### cd
+> 현재 직업 디렉터리를 변경한다.
+
+![](./resource/command_cd.png)
+```c
+void command_cd(char* directory) {
+    if (chdir(directory) != 0) {
+        print_error();
+    }
+}
+```
+- `chdir(directory)`로 현재 작업 디렉터리를 변경하고, 만약 실패했을시 오류 메시지를 출력하도록 설계하였다.
+
+### path
+> 명령어 검색 경로를 설정하거나 출력한다.
+
+![](./resource/command_path.png)
+
+```c
+void command_path(char** paths) {
+    if (paths[0] == NULL) {
+        setenv("PATH", "", 1);
+        printf("PATH cleared\n");
+    } else {
+        char new_path[MAX_INPUT_SIZE] = "";
+        for (int i = 0; paths[i] != NULL; i++) {
+            if (i > 0) {
+                strcat(new_path, ":");
+            }
+            strcat(new_path, paths[i]);
+        }
+        setenv("PATH", new_path, 1);
+        printf("PATH set to: %s\n", new_path);
+    }
+}
+```
+- `setenv("PATH", "", 1)`: 인자가 없을 경우 PATH를 비운다.
+- 경로 인자들을 연결하여 새로운 PATH로 설정한다.
+- 설정된 PATH를 출력한다.
+
+## 기능
+### 리다이렉션 (>)
+> 명령어의 출력을 지정한 파일로 리다이렉션 한다.
+
+![](./resource/func_redirect.png)
+
+![](./resource/result.png)
+
+#### 구현 설명
+- 리다이렉션은 명령어를 파싱할 때 `>` 문자를 확인하여 구현한다. 
+- 아래 코드에서는 들어온 명령어를 token화 하는 과정에 리다이렉션인지 트리거하는 문자를 확인하는 과정을 추가했다.
+
+```c
+  while (token != NULL) {
+        if (strcmp(token, ">") == 0) {
+            token = strtok(NULL, " \t");
+            if (token != NULL) {
+                output_file = token;
+            } else {
+                print_error();
+                return;
+            }
+            break;
+        } else {
+            args[argc++] = token;
+        }
+        token = strtok(NULL, " \t");
+    }
+```
+
 ## 참고 자료
 - [Makefile 및 빌드 시스템](https://en.wikipedia.org/wiki/Make_(software))
 - ![](./resource/wish_run.png)
