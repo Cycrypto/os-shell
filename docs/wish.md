@@ -88,6 +88,18 @@ void command_path(char** paths) {
 - 경로 인자들을 연결하여 새로운 PATH로 설정한다.
 - 설정된 PATH를 출력한다.
 
+### exit
+> 쉘을 종료한다.
+
+![](./resource/command_exit.png)
+```c
+void command_exit() {
+    printf("exit shell\n");
+    exit(0);
+}
+```
+- 쉘 종료 문구를 출력하고 쉘을 종료한다.
+
 ## 기능
 ### 리다이렉션 (>)
 > 명령어의 출력을 지정한 파일로 리다이렉션 한다.

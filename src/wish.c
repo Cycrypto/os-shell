@@ -31,7 +31,22 @@ void interactive_mode() {
             continue;
         }
 
-        execute_command(input); // 명령어 실행
+        // background 명령어 체크
+        char *token[10];
+        int count = count_background(input);
+        if (count > 0) {
+            split_command(input, token, 10);
+            printf("token 0: %s\n", token[0]);
+            execute_command(token[0], 0); // 일반 실행
+            // execute_command(token[0], 0)실행 후  뒤 명령어 실행 안되고 다시 대화모드로 돌아감.
+            printf("test\n"); // test
+            for (int i = 1; i < count; i++) {
+                printf("token %d: %s\n", i, token[i]);
+                execute_command(token[i], 1); // 백그라운드로 실행
+            }
+        } else {
+            execute_command(input, 0);
+        }
     }
 }
 
@@ -51,13 +66,28 @@ void batch_mode(const char* filename) {
             continue;
         }
 
-        execute_command(line); // 명령어 실행
+        // background 명령어 체크
+        char *token[10];
+        int count = count_background(input);
+        if (count > 0) {
+            split_command(input, token, 10);
+            printf("token 0: %s\n", token[0]);
+            execute_command(token[0], 0); // 일반 실행
+            // execute_command(token[0], 0)실행 후  뒤 명령어 실행 안되고 다시 대화모드로 돌아감.
+            printf("test\n"); // test
+            for (int i = 1; i < count; i++) {
+                printf("token %d: %s\n", i, token[i]);
+                execute_command(token[i], 1); // 백그라운드로 실행
+            }
+        } else {
+            execute_command(input, 0);
+        }
     }
 
     fclose(file); // 파일 닫기
 }
 
-void execute_command(char* command) {
+void execute_command(char* command, int isbg) {
     char* args[10];
     int argc = 0;
 
@@ -99,8 +129,7 @@ void execute_command(char* command) {
     } else if (strcmp(args[0], "path") == 0) {
         command_path(args + 1);
     } else if (strcmp(args[0], "exit") == 0) {
-	printf("exit shell\n");
-	exit(0);
+        command_exit();
     } else {
         pid_t pid = fork();
         if (pid < 0) {
@@ -119,7 +148,11 @@ void execute_command(char* command) {
             print_error();
             exit(1);
         } else {
-            wait(NULL);
+            if (isbg == 1) {
+                printf("백그라운드 프로세스 PID: %d\n", pid);
+            } else {
+                wait(NULL);
+            }
         }
     }
 }
@@ -136,7 +169,6 @@ void command_cd(char* directory) {
     } else {
         print_error();
     }
-
 }
 
 void command_path(char** paths) {
@@ -156,6 +188,37 @@ void command_path(char** paths) {
     }
 }
 
+void command_exit() {
+    printf("exit shell\n");
+    exit(0);
+}
+
 void print_error() {
     write(STDERR_FILENO, ERROR_MESSAGE, strlen(ERROR_MESSAGE));
+}
+
+// & 기호 개수 카운트 함수
+int count_background(const char *input) {
+    int cnt = 0;
+    while (*input) {
+        if (*input == '&') { // & 기호 발견시 카운트 증가
+            cnt++;
+        }
+        input++;
+    }
+    return cnt; // 카운트 리턴
+}
+
+// & 기호 기준 명령어 분할 함수
+void split_command(const char *input, char *token[], int tok) {
+    char copy[MAX_INPUT_SIZE];
+    strcpy(copy, input);
+    char *tokenPtr = strtok(copy, "&");
+    int i = 0;
+
+    while (tokenPtr != NULL && i < tok) {
+        token[i] = tokenPtr;
+        tokenPtr = strtok(NULL, "&");
+        i++;
+    }
 }

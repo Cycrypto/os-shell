@@ -14,9 +14,12 @@
 #define PROMPT "wish> "
 
 void print_error();
-void execute_command(char *command);
+void execute_command(char *command, int isbg); // 백그라운드 플래그 추가
 void interactive_mode();
 void batch_mode(const char* filename);
-void command_cd(char* directory);//cd �������
-void command_path(char** path);//path �������
+void command_cd(char* directory); // cd command
+void command_path(char** path); // path command
+void command_exit(); // exit command
+int count_background(const char *input); // & 기호 개수 카운트
+void split_command(const char *input, char *token[], int tok); // & 기호 기준 명령어 분할
 #endif
