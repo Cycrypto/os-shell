@@ -1,19 +1,15 @@
 #include "wish.h"
 
-//이 브랜치에서 구현할 것
-//- 내장명령 cd와 path : 대화형모드
-//- 리다이렉션 기능
 int main(int argc, char** argv) {
-    if (argc > 1) { // 인자가 주어진 경우 배치 모드
-        batch_mode(argv[1]); // 첫 번째 인자(파일 이름)를 배치 모드에 전달
-    } else { // 인자가 없으면 대화형 모드
-        interactive_mode(); // 대화형 모드 실행
+    if (argc > 1) {
+        batch_mode(argv[1]);
+    } else {
+        interactive_mode();
     }
 
     return 0;
 }
 
-// 대화형 모드 구현 함수
 void interactive_mode() {
     char input[MAX_INPUT_SIZE];
 
@@ -34,19 +30,18 @@ void interactive_mode() {
         // background 명령어 체크
         char *token[10];
         int count = count_background(input);
+        printf("count : %d\n", count);
         if (count > 0) {
             split_command(input, token, 10);
-            printf("token 0: %s\n", token[0]);
-            execute_command(token[0], 0); // 일반 실행
-            // execute_command(token[0], 0)실행 후  뒤 명령어 실행 안되고 다시 대화모드로 돌아감.
-            printf("test\n"); // test
-            for (int i = 1; i < count; i++) {
+            for (int i = 0; i < count; i++) {
                 printf("token %d: %s\n", i, token[i]);
                 execute_command(token[i], 1); // 백그라운드로 실행
             }
+            execute_command(token[count], 0); // 일반 실행
         } else {
             execute_command(input, 0);
         }
+
     }
 }
 
@@ -68,19 +63,17 @@ void batch_mode(const char* filename) {
 
         // background 명령어 체크
         char *token[10];
-        int count = count_background(input);
+        int count = count_background(line);
         if (count > 0) {
-            split_command(input, token, 10);
+            split_command(line, token, 10);
             printf("token 0: %s\n", token[0]);
             execute_command(token[0], 0); // 일반 실행
-            // execute_command(token[0], 0)실행 후  뒤 명령어 실행 안되고 다시 대화모드로 돌아감.
-            printf("test\n"); // test
-            for (int i = 1; i < count; i++) {
-                printf("token %d: %s\n", i, token[i]);
-                execute_command(token[i], 1); // 백그라운드로 실행
+            for (int i = 0; i < count; i++) {
+                printf("token %d: %s\n", i, token[i-1]);
+                execute_command(token[i-1], 1); // 백그라운드로 실행
             }
         } else {
-            execute_command(input, 0);
+            execute_command(line, 0);
         }
     }
 
@@ -151,7 +144,7 @@ void execute_command(char* command, int isbg) {
             if (isbg == 1) {
                 printf("백그라운드 프로세스 PID: %d\n", pid);
             } else {
-                wait(NULL);
+                waitpid(pid, NULL, 0); // 수정: wait에서 waitpid로 변경
             }
         }
     }
@@ -197,28 +190,25 @@ void print_error() {
     write(STDERR_FILENO, ERROR_MESSAGE, strlen(ERROR_MESSAGE));
 }
 
-// & 기호 개수 카운트 함수
 int count_background(const char *input) {
-    int cnt = 0;
-    while (*input) {
-        if (*input == '&') { // & 기호 발견시 카운트 증가
-            cnt++;
+    int count = 0;
+    for (int i = 0; input[i] != '\0'; i++) {
+        if (input[i] == '&') {
+            count++;
         }
-        input++;
     }
-    return cnt; // 카운트 리턴
+    return count;
 }
 
-// & 기호 기준 명령어 분할 함수
 void split_command(const char *input, char *token[], int tok) {
-    char copy[MAX_INPUT_SIZE];
-    strcpy(copy, input);
-    char *tokenPtr = strtok(copy, "&");
+    char *temp = strdup(input); // 입력 문자열을 변경하기 전에 복사본을 만듭니다.
+    char *cmd = strtok(temp, "&");
     int i = 0;
-
-    while (tokenPtr != NULL && i < tok) {
-        token[i] = tokenPtr;
-        tokenPtr = strtok(NULL, "&");
-        i++;
+    while (cmd != NULL && i < tok) {
+        token[i++] = strdup(cmd); // 각 토큰을 복제하여 저장합니다.
+        cmd = strtok(NULL, "&");
     }
+    token[i] = NULL; // 토큰 배열의 끝을 나타내기 위해 NULL을 추가합니다.
+    free(temp); // 임시 문자열을 해제합니다.
 }
+
