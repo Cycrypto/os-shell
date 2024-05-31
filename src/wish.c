@@ -200,15 +200,13 @@ int count_background(const char *input) {
     return count;
 }
 
-void split_command(const char *input, char *token[], int tok) {
-    char *temp = strdup(input); // 입력 문자열을 변경하기 전에 복사본을 만듭니다.
-    char *cmd = strtok(temp, "&");
+void split_command(char *input, char *token[], int tok) {
+    char *cmd = strtok(input, "&");
     int i = 0;
     while (cmd != NULL && i < tok) {
-        token[i++] = strdup(cmd); // 각 토큰을 복제하여 저장합니다.
+        token[i++] = cmd; // 각 토큰을 복제하여 저장합니다.
         cmd = strtok(NULL, "&");
     }
     token[i] = NULL; // 토큰 배열의 끝을 나타내기 위해 NULL을 추가합니다.
-    free(temp); // 임시 문자열을 해제합니다.
 }
 
