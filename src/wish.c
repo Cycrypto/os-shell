@@ -30,11 +30,9 @@ void interactive_mode() {
         // background 명령어 체크
         char *token[10];
         int count = count_background(input);
-        printf("count : %d\n", count);
         if (count > 0) {
             split_command(input, token, 10);
             for (int i = 0; i < count; i++) {
-                printf("token %d: %s\n", i, token[i]);
                 execute_command(token[i], 1); // 백그라운드로 실행
             }
             execute_command(token[count], 0); // 일반 실행
@@ -66,12 +64,11 @@ void batch_mode(const char* filename) {
         int count = count_background(line);
         if (count > 0) {
             split_command(line, token, 10);
-            printf("token 0: %s\n", token[0]);
-            execute_command(token[0], 0); // 일반 실행
             for (int i = 0; i < count; i++) {
                 printf("token %d: %s\n", i, token[i-1]);
                 execute_command(token[i-1], 1); // 백그라운드로 실행
             }
+	    execute_command(token[count], 0); // 일반 실행
         } else {
             execute_command(line, 0);
         }
@@ -182,7 +179,7 @@ void command_path(char** paths) {
 }
 
 void command_exit() {
-    printf("exit shell\n");
+    printf("Exit shell.\n");
     exit(0);
 }
 
