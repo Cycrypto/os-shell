@@ -1,5 +1,6 @@
 #ifndef WISH_H
 #define WISH_H
+#define _POSIX_C_SOURCE 200112L
 
 #include <stdio.h>
 #include <stdlib.h>
