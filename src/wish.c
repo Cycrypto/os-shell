@@ -65,7 +65,6 @@ void batch_mode(const char* filename) {
         if (count > 0) {
             split_command(line, token, 10);
             for (int i = 0; i < count; i++) {
-                printf("token %d: %s\n", i, token[i-1]);
                 execute_command(token[i], 1); // 백그라운드로 실행
             }
 	    execute_command(token[count], 0); // 일반 실행
