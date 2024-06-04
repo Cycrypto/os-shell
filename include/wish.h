@@ -1,5 +1,6 @@
 #ifndef WISH_H
 #define WISH_H
+#define _POSIX_C_SOURCE 200112L
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,5 +22,5 @@ void command_cd(char* directory); // cd command
 void command_path(char** path); // path command
 void command_exit(); // exit command
 int count_background(const char *input); // & 기호 개수 카운트
-void split_command(const char *input, char *token[], int tok); // & 기호 기준 명령어 분할
+void split_command(char *input, char *token[], int tok); // & 기호 기준 명령어 분할
 #endif
